@@ -28,7 +28,6 @@ clock = pygame.time.Clock()
 boomer = pygame.image.load("boomer01.png")
 bullet = pygame.image.load("bullet.png")
 
-bullet_clones = []
 
 def xSinize(offset,rot,factor):
 	return offset + numpy.sin(numpy.pi/180*rot) * factor
@@ -112,9 +111,9 @@ class Player(pygame.sprite.Sprite):
 				tipY = self.y + yCosize(-3.5,self.rot,1)
 				tipX += xSinize(0,self.rot+90,self.offset)
 				tipY += yCosize(0,self.rot+90,self.offset)
-				bullet_clones.append(Bullet((tipX,tipY),self.rot))
+				bullet = Bullet((tipX,tipY),self.rot)
 				self.alternate = not self.alternate
-				all_sprites.add(bullet_clones[len(bullet_clones)-1])
+				all_sprites.add(bullet)
 				self.Xspeed -= xSinize(0,self.rot,self.recoil)
 				self.Yspeed -= yCosize(0,self.rot,self.recoil)
 
