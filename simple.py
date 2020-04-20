@@ -30,6 +30,8 @@ boomer_steer = pygame.image.load("boomer01_steer.png")
 bullet = pygame.image.load("bullet.png")
 tachonoid01 = pygame.image.load("tachonoid01.png")
 tachonoid02 = pygame.image.load("tachonoid02.png")
+explosion = pygame.image.load("explo.png")
+
 
 def rot_sprite(image,rect,angle):
 	rot_image = pygame.transform.rotate(image,angle)
@@ -62,6 +64,11 @@ class Tachonoid(pygame.sprite.Sprite):
 		self.rect.y = self.y
 		self.rect.x = self.x
 		self.step = 0
+		all_sprites.add(self)
+		enemies.add(self)
+	
+	def hit(self):
+		self.kill()
 
 	def update(self):
 		self.step += 1
@@ -99,6 +106,8 @@ class Bullet(pygame.sprite.Sprite):
 		self.speed = -10
 		self.rect.y = self.y+self.speed
 		self.rect.x = self.x
+		all_sprites.add(self)
+		bullets.add(self)
 
 	def update(self):
 		self.y += self.speed
@@ -149,14 +158,15 @@ class Player(pygame.sprite.Sprite):
 					self.offset = 5
 				else:
 					self.offset = 20
-				bullet = Bullet(self.x+self.offset,self.y)	
+				new_bullet = Bullet(self.x+self.offset,self.y)	
 				self.alternate = not self.alternate
-				all_sprites.add(bullet)
 
 		self.rect.x = self.x
 
 
 all_sprites = pygame.sprite.Group()
+bullets = pygame.sprite.Group()
+enemies = pygame.sprite.Group()
 player = Player()
 all_sprites.add(player)
 
@@ -174,7 +184,13 @@ while running:
 #new enemies
 	if pygame.time.get_ticks() % 100 == 0:
 		enemy = Tachonoid(1)
-		all_sprites.add(enemy)
+
+#hit enemy
+	for hit_scan in bullets:
+		for enemy_scan in enemies:
+			if hit_scan.rect.colliderect(enemy_scan.rect):
+				hit_scan.kill()
+				enemy_scan.hit()
 
 #update
 	all_sprites.update()
