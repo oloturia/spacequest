@@ -30,7 +30,10 @@ boomer_steer = pygame.image.load("boomer01_steer.png")
 bullet = pygame.image.load("bullet.png")
 tachonoid01 = pygame.image.load("tachonoid01.png")
 tachonoid02 = pygame.image.load("tachonoid02.png")
-explosion = pygame.image.load("explo.png")
+explo_full = pygame.image.load("explo.png")
+explosion = []
+for x in range(0,300,60):
+	explosion.append(explo_full.subsurface((x,0,60,60)))
 
 
 def rot_sprite(image,rect,angle):
@@ -63,35 +66,50 @@ class Tachonoid(pygame.sprite.Sprite):
 		self.rect = self.image.get_rect()
 		self.rect.y = self.y
 		self.rect.x = self.x
-		self.step = 0
+		self.step = 0  # formation stage
+		self.frame = -1 # explosion frame
 		all_sprites.add(self)
 		enemies.add(self)
 	
 	def hit(self):
-		self.kill()
+		if self.frame == -1:
+			self.frame = 0
 
 	def update(self):
-		self.step += 1
-		if self.formation == 1:
-			if self.step < self.phase1:
-				self.y += 6
-			elif self.step == self.phase1:
-				self.image,self.rect = rot_sprite(self.image,self.rect,45)
-			elif self.step > self.phase1 and self.step < self.phase2:
-				self.y += 3
-				self.x += 3
-			elif self.step == self.phase2:
-				self.image,self.rect = rot_sprite(self.image,self.rect,45)
-			elif self.step > self.phase2:
-				self.x += 3
-		if self.formation == 2:
-			pass
-		if self.formation == 3:
-			pass
-		if self.formation == 4:
-			pass
-		self.rect.x = self.x
-		self.rect.y = self.y
+		if self.frame == 0:
+			self.image = explosion[self.frame]
+			self.last  = pygame.time.get_ticks()
+			self.frame = 1
+		elif self.frame >0 and  self.frame <5:
+			if pygame.time.get_ticks() - self.last > 50:
+				self.image = explosion[self.frame]
+				self.last = pygame.time.get_ticks()
+				self.frame +=1
+		elif self.frame == 5:
+			if pygame.time.get_ticks() - self.last > 40:
+				self.kill()
+		else:
+			self.step += 1
+			if self.formation == 1:
+				if self.step < self.phase1:
+					self.y += 6
+				elif self.step == self.phase1:
+					self.image,self.rect = rot_sprite(self.image,self.rect,45)
+				elif self.step > self.phase1 and self.step < self.phase2:
+					self.y += 3
+					self.x += 3
+				elif self.step == self.phase2:
+					self.image,self.rect = rot_sprite(self.image,self.rect,45)
+				elif self.step > self.phase2:
+					self.x += 3
+			if self.formation == 2:
+				pass
+			if self.formation == 3:
+				pass
+			if self.formation == 4:
+				pass
+			self.rect.x = self.x
+			self.rect.y = self.y
 
 #bullet definition
 class Bullet(pygame.sprite.Sprite):
